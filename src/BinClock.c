@@ -4,14 +4,15 @@
  * Modified for EEE3095S/3096S by Keegan Crankshaw
  * August 2019
  * 
- * <STUDNUM_1> <STUDNUM_2>
- * Date
+ * adjzai001 rmjhrs001
+ * 20/08/2019
 */
 
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 #include <stdio.h> //For printf functions
 #include <stdlib.h> // For system functions
+#include <signal.h> // For cleaning up GPIO
 
 #include "BinClock.h"
 #include "CurrentTime.h"
@@ -35,7 +36,7 @@ void initGPIO(void){
 	RTC = wiringPiI2CSetup(RTCAddr); //Set up the RTC
 	
 	//Set up the LEDS
-	for(int i; i < sizeof(LEDS)/sizeof(LEDS[0]); i++){
+	for(int i=0; i < sizeof(LEDS)/sizeof(LEDS[0]); i++){
 	    pinMode(LEDS[i], OUTPUT);
 	}
 	
@@ -47,7 +48,7 @@ void initGPIO(void){
 	printf("LEDS done\n");
 	
 	//Set up the Buttons
-	for(int j; j < sizeof(BTNS)/sizeof(BTNS[0]); j++){
+	for(int j=0; j < sizeof(BTNS)/sizeof(BTNS[0]); j++){
 		pinMode(BTNS[j], INPUT);
 		pullUpDnControl(BTNS[j], PUD_UP);
 	}
@@ -61,6 +62,16 @@ void initGPIO(void){
 	printf("Setup done\n");
 }
 
+void cleanupGPIO(int dum) {
+	for(int i=0; i < sizeof(LEDS)/sizeof(LEDS[0]); i++){
+	    pinMode(LEDS[i], INPUT);
+	}
+	pinMode(SEC, INPUT);
+	for(int j=0; j < sizeof(BTNS)/sizeof(BTNS[0]); j++){
+		pinMode(BTNS[j], INPUT);
+	}
+}
+
 
 /*
  * The main function
@@ -68,6 +79,8 @@ void initGPIO(void){
  */
 int main(void){
 	initGPIO();
+
+	signal(SIGINT, cleanupGPIO);
 
 	//Set random time (3:04PM)
 	//You can comment this file out later
@@ -110,7 +123,16 @@ int hFormat(int hours){
  * Turns on corresponding LED's for hours
  */
 void lightHours(int units){
-	// Write your logic to light up the hour LEDs here	
+	// Write your logic to light up the hour LEDs here
+	int hours = hFormat(units);
+
+	for (int i=6; i < 10; ++i) {	// Last 4 LEDs in array are Hours
+		if (hours & (1<<i))
+			digitalWrite(LEDS[i], HIGH);
+		else
+			digitalWrite(LEDS[i], LOW);
+		
+	}
 }
 
 /*
@@ -118,6 +140,13 @@ void lightHours(int units){
  */
 void lightMins(int units){
 	//Write your logic to light up the minute LEDs here
+	for (int i=0; i < 6; ++i) {	// First 6 LEDs in array are Minutes
+		if (units & (1<<i))
+			digitalWrite(LEDS[i], HIGH);
+		else
+			digitalWrite(LEDS[i], LOW);
+		
+	}
 }
 
 /*
@@ -127,6 +156,7 @@ void lightMins(int units){
  */
 void secPWM(int units){
 	// Write your logic here
+	pwmWrite(SEC, units);
 }
 
 /*
