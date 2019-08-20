@@ -70,6 +70,7 @@ void cleanupGPIO(int dum) {
 	for(int j=0; j < sizeof(BTNS)/sizeof(BTNS[0]); j++){
 		pinMode(BTNS[j], INPUT);
 	}
+	exit(1);
 }
 
 
@@ -131,7 +132,6 @@ void lightHours(int units){
 			digitalWrite(LEDS[i], HIGH);
 		else
 			digitalWrite(LEDS[i], LOW);
-		
 	}
 }
 
@@ -145,7 +145,6 @@ void lightMins(int units){
 			digitalWrite(LEDS[i], HIGH);
 		else
 			digitalWrite(LEDS[i], LOW);
-		
 	}
 }
 
@@ -224,12 +223,18 @@ int decCompensation(int units){
 void hourInc(void){
 	//Debounce
 	long interruptTime = millis();
+	int hoursHex;
 
 	if (interruptTime - lastInterruptTime>200){
 		printf("Interrupt 1 triggered, %x\n", hours);
 		//Fetch RTC Time
+		hoursHex = wiringPiI2CReadReg8(RTC, HOUR);
+		hours = hexCompensation(hoursHex);
 		//Increase hours by 1, ensuring not to overflow
+		hours = (hours==23) ? 0 : hours++;
 		//Write hours back to the RTC
+		hoursHex = decCompensation(hours);
+		wiringPiI2CWriteReg8(RTC, HOUR, hoursHex);
 	}
 	lastInterruptTime = interruptTime;
 }
@@ -242,12 +247,18 @@ void hourInc(void){
  */
 void minInc(void){
 	long interruptTime = millis();
+	int minsHex;
 
 	if (interruptTime - lastInterruptTime>200){
 		printf("Interrupt 2 triggered, %x\n", mins);
 		//Fetch RTC Time
-		//Increase minutes by 1, ensuring not to overflow
-		//Write minutes back to the RTC
+		minsHex = wiringPiI2CReadReg8(RTC, MIN);
+		mins = hexCompensation(minsHex);
+		//Increase mins by 1, ensuring not to overflow
+		mins = (mins==23) ? 0 : mins++;
+		//Write mins back to the RTC
+		minsHex = decCompensation(mins);
+		wiringPiI2CWriteReg8(RTC, MIN, minsHex);
 	}
 	lastInterruptTime = interruptTime;
 }
