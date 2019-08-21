@@ -115,7 +115,7 @@ int main(void){
 		secPWM(secs);
 		
 		// Print out the time we have stored on our RTC
-		printf("The current time is: %x:%x:%x\n", hours, mins, secs);
+		printf("The current time is: %d:%d:%d\n", hours, mins, secs);
 
 		//using a delay to make our program "less CPU hungry"
 		delay(1000); //milliseconds
@@ -243,7 +243,7 @@ void hourInc(void){
 	int hoursDec, hoursHex;
 
 	if (interruptTime - lastInterruptTime>200){
-		printf("Interrupt 1 triggered, %x\n", hours);
+		printf("Interrupt 1 triggered, %d\n", hours);
 		//Fetch RTC Time
 		hoursHex = wiringPiI2CReadReg8(RTC, HOUR);
 		hoursDec = hexCompensation(hoursHex);
@@ -267,7 +267,7 @@ void minInc(void){
 	int minsDec, minsHex;
 
 	if (interruptTime - lastInterruptTime>200){
-		printf("Interrupt 2 triggered, %x\n", mins);
+		printf("Interrupt 2 triggered, %d\n", mins);
 		//Fetch RTC Time
 		minsHex = wiringPiI2CReadReg8(RTC, MIN);
 		minsDec = hexCompensation(minsHex);
