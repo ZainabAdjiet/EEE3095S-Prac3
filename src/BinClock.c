@@ -42,7 +42,7 @@ void initGPIO(void){
 	
 	//Set Up the Seconds LED for PWM
 	//Write your logic here
-	pinMode(SECS, OUTPUT);
+	pinMode(SECS, PWM_OUTPUT);
 	pwmSetRange(60);
 
 	printf("LEDS done\n");
@@ -88,6 +88,9 @@ int main(void){
 	wiringPiI2CWriteReg8(RTC, HOUR, 0x13+TIMEZONE);
 	wiringPiI2CWriteReg8(RTC, MIN, 0x4);
 	wiringPiI2CWriteReg8(RTC, SEC, 0x00);
+
+	// start RTC
+	wiringPiI2CWriteReg8(RTC, SEC, 0x80);
 
 	int secsHex, minsHex, hoursHex;
 	
@@ -172,7 +175,7 @@ void lightMins(int units){
  */
 void secPWM(int units){
 	// Write your logic here
-	pwmWrite(SEC, units);
+	pwmWrite(SECS, units);
 }
 
 /*
