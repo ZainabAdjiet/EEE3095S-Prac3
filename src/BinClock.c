@@ -144,7 +144,7 @@ void lightHours(int units){
 	// Write your logic to light up the hour LEDs here
 	int hours = hFormat(units);
 
-	for (int i=6; i < 10; ++i) {	// Last 4 LEDs in array are Hours
+	for (int i=0; i < 4; ++i) {	// First 4 LEDs in array are Hours
 		if (hours & (1<<i))
 			digitalWrite(LEDS[i], HIGH);
 		else
@@ -157,11 +157,11 @@ void lightHours(int units){
  */
 void lightMins(int units){
 	//Write your logic to light up the minute LEDs here
-	for (int i=0; i < 6; ++i) {	// First 6 LEDs in array are Minutes
+	for (int i=0; i < 6; ++i) {	// Last 6 LEDs in array are Minutes
 		if (units & (1<<i))
-			digitalWrite(LEDS[i], HIGH);
+			digitalWrite(LEDS[i+4], HIGH);
 		else
-			digitalWrite(LEDS[i], LOW);
+			digitalWrite(LEDS[i+4], LOW);
 	}
 }
 
