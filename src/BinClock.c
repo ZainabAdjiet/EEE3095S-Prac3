@@ -240,7 +240,7 @@ int decCompensation(int units){
 void hourInc(void){
 	//Debounce
 	long interruptTime = millis();
-	int hoursDec, hoursHex;
+	int hoursDec = 0, hoursHex = 0;
 
 	if (interruptTime - lastInterruptTime>200){
 		printf("Interrupt 1 triggered, %d\n", hours);
@@ -248,7 +248,8 @@ void hourInc(void){
 		hoursHex = wiringPiI2CReadReg8(RTC, HOUR);
 		hoursDec = hexCompensation(hoursHex);
 		//Increase hours by 1, ensuring not to overflow
-		hoursDec = (hoursDec==23) ? 0 : hoursDec++;
+		if (hoursDec == 23)		hoursDec = 0;
+		else					++hoursDec;
 		//Write hours back to the RTC
 		hoursHex = decCompensation(hoursDec);
 		wiringPiI2CWriteReg8(RTC, HOUR, hoursHex);
@@ -264,7 +265,7 @@ void hourInc(void){
  */
 void minInc(void){
 	long interruptTime = millis();
-	int minsDec, minsHex;
+	int minsDec = 0, minsHex = 0;
 
 	if (interruptTime - lastInterruptTime>200){
 		printf("Interrupt 2 triggered, %d\n", mins);
@@ -272,7 +273,8 @@ void minInc(void){
 		minsHex = wiringPiI2CReadReg8(RTC, MIN);
 		minsDec = hexCompensation(minsHex);
 		//Increase mins by 1, ensuring not to overflow
-		minsDec = (minsDec==59) ? 0 : minsDec++;
+		if (minsDec == 59)	minsDec = 0;
+		else				++minsDec;
 		//Write mins back to the RTC
 		minsHex = decCompensation(minsDec);
 		wiringPiI2CWriteReg8(RTC, MIN, minsHex);
