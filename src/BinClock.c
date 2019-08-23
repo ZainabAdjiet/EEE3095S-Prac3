@@ -85,12 +85,11 @@ int main(void){
 
 	//Set random time (3:04PM)
 	//You can comment this file out later
-	wiringPiI2CWriteReg8(RTC, HOUR, 0x13+TIMEZONE);
-	wiringPiI2CWriteReg8(RTC, MIN, 0x4);
-	wiringPiI2CWriteReg8(RTC, SEC, 0x00);
+	//wiringPiI2CWriteReg8(RTC, HOUR, 0x13+TIMEZONE);
+	//wiringPiI2CWriteReg8(RTC, MIN, 0x4);
+	//wiringPiI2CWriteReg8(RTC, SEC, 0x00);
 
-	// start RTC
-	wiringPiI2CWriteReg8(RTC, SEC, 0x80);
+	toggleTime();	// get time from pi
 
 	int secsHex, minsHex, hoursHex;
 	
@@ -109,6 +108,7 @@ int main(void){
 
 		//get secs
 		secsHex = wiringPiI2CReadReg8(RTC, SEC);
+		secsHex -= 0x80;	// get rid of bit
 		secs = hexCompensation(secsHex);
 		
 		//Function calls to toggle LEDs
